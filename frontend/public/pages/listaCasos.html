@@ -3,6 +3,14 @@
 <head>
 
 <script type="text/javascript">
+  var pagina = window.location.href;
+  let pagina_error = pagina.split('#');
+
+
+//tirar error VAZIO PAGINACAO
+  if(pagina_error[1] == "NaN"){
+     window.location.replace("http://localhost:8080/pages/listaCasos.html#1");
+   }
 
 
 var btn_log = -1 ;
@@ -26,6 +34,10 @@ function mudar(){
   window.location.href = proximo;
    document.location.reload(true);
  //alert(proximo);
+
+
+
+
   
 }
 
@@ -68,6 +80,56 @@ function deletar(button){
 
 }
 
+
+function perfil(){
+ 
+  Api.getPerfil();
+
+}
+
+
+
+function updatePerfil(){
+
+   var name_ = document.getElementById('name').value
+    var email_ = document.getElementById('email').value;
+    var whatsapp_ = document.getElementById('whatsapp').value;
+    var user_id_ = String(logado_key);
+    var password_ = document.getElementById('password').value;
+
+     const body = {
+           name: name_,
+           email: email_,
+           whatsapp: whatsapp_,
+           password: password_
+   };
+ //      //    user_id: user_id_,
+
+    if(password_ === "") {
+        window.location.replace("http://localhost:8080/pages");
+
+
+
+   }else{
+            axios.put(`http://localhost:3333/users/${user_id_}/`, body, {
+               headers: {
+      'Authorization': `${String(logado_key)}`
+    }
+
+          })
+        .then(function (response) {
+           console.log(response)
+           document.location.reload(true);
+           // window.location.replace("http://localhost:8080/pages/listaCasos.html#1");
+       })
+         .catch(function (error) {
+           console.log(error)
+          
+          });
+    }
+ 
+  
+}
 
 
 function editar(button){
@@ -126,10 +188,10 @@ function editar(button){
         <h6>Bem-Vindo, <script type="text/javascript">document.write(logado)</script></h6>
         
         <a href="cadastroCaso.html">
-            <button>Cadastrar novo Caso</button> 
-
-        </a>
+            <button>Cadastrar novo Caso</button></a>
+        <a href="#"><button onclick="perfil();" data-toggle="modal" data-target="#modal_user">Perfil</button></a>
         <a href="#"><button onclick="logout();">Sair</button></a>
+
 
     </header>
     <div id="linha2">
@@ -144,7 +206,7 @@ function editar(button){
 
 
         <!-- The Modal -->
-        <div class="modal" id="myModal">
+        <div class="modal" id="modal_case">
             <div class="modal-dialog">
                 <div class="modal-content">
 
@@ -183,6 +245,46 @@ function editar(button){
             </div>
         </div>
 
+
+
+              <!-- The Modal -->
+        <div class="modal" id="modal_user">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="id_caso">Editar Dados</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <label>Nome:</label>
+                        <input id="name" value="" class="form-control">
+                        <br>
+                        <label>Email:</label>
+                        <input id="email" value="" class="form-control">
+                        <br>
+                        <label>Whatsapp:</label>
+                        <input id="whatsapp" value="" class="form-control">
+                        <br>
+                        <label>Password</label>
+                        <input id="password" value="" class="form-control">
+
+
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal" id="update_users" onclick="updatePerfil();">Salvar</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 
 
@@ -211,6 +313,24 @@ window.location.replace("http://localhost:8080/pages/index.html");
 }
 
     class Api{
+
+
+      static async getPerfil (){
+       axios.get(`http://localhost:3333/users` ,
+       {
+          headers: {
+    'Authorization': `${String(logado_key)}`
+       }
+       })
+      .then(response => (document.getElementById('name').value = response.data[0].name
+      	                 ,document.getElementById('email').value = response.data[0].email
+      	                 ,document.getElementById('whatsapp').value = response.data[0].whatsapp
+      	                 ,document.getElementById('password').value = response.data[0].password
+      	))
+
+      
+      .catch(error => console.log(error)) 
+     }
 
 
      static async getCases (log_id,page){
@@ -281,7 +401,7 @@ if(logado === '' || logado === 'null')  {
       btn_edi.setAttribute("id", "editar");
      // btn_aju.setAttribute("class", "deletar");
       btn_edi.setAttribute("data-toggle", "modal");
-      btn_edi.setAttribute("data-target", "#myModal");
+      btn_edi.setAttribute("data-target", "#modal_case");
       btn_edi.setAttribute("onClick", "editar("+btn_log+");");
       btn_edi.innerHTML = "Editar";  
 
@@ -375,6 +495,9 @@ if(logado === '' || logado === 'null')  {
 
 
 
+
+
+
   $( "#update" ).click(function() {
 
 
@@ -428,5 +551,10 @@ if(logado === '' || logado === 'null')  {
 
 });
 
+// $( "#update_users" ).click(function() {
+
+ 
+
+// });
 
 </script>
