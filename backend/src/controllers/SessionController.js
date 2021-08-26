@@ -11,10 +11,9 @@ module.exports = {
 
       if (!user) {
         return response.status(422).json({ error: 'No User with this login or password' });
+      }else{
+        return response.json(user);
       }
-      return response.json(user);
-      
-      
     } catch (error) {
       return response.status(500).send(error);
     }

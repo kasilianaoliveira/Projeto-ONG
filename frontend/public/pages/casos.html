@@ -2,8 +2,136 @@
 <html lang="en">
 <head>
   <script type="text/javascript">
+
+  var pagina = window.location.href;
+  let pagina_error = pagina.split('#');
+
+
+//tirar error VAZIO PAGINACAO
+  if(pagina_error[1] == "NaN"){
+     window.location.replace("http://localhost:8080/pages/casos.html#1");
+   }
  
+
+var btn_log = -1 ; 
 var logado = sessionStorage.getItem('key')
+var logado_key = sessionStorage.getItem('key_id')
+
+
+
+function mudar(){
+  var t = window.location.href;
+  let novo = t.split('#');
+
+  var arroz = parseInt(novo[1]) + 1
+  
+  var proximo = novo[0]+'#'+arroz;
+  window.location.href = proximo;
+   document.location.reload(true);
+ //alert(proximo);
+
+  
+}
+
+function voltar(){
+  var t = window.location.href;
+  let novo = t.split('#');
+
+  var arroz = parseInt(novo[1]) - 1
+
+  if(arroz >= 1){
+    var proximo = novo[0]+'#'+arroz;
+    window.location.href = proximo;
+    document.location.reload(true);
+  }
+  
+
+ //alert(proximo);
+  
+}
+
+function sessionLogin(){
+  if(logado_key === null){
+    logout();
+  }
+}
+
+
+
+
+function perfil(){
+ 
+  Api.getPerfil();
+
+}
+
+function ajudar(button){
+
+  let buscar = document.querySelectorAll('#fieldset');
+
+ //innerText
+
+  let whatsapp = buscar[button].childNodes[1].innerText;
+  let email = buscar[button].childNodes[2].innerText;
+
+  document.getElementById("whatsapp").value = whatsapp;
+  document.getElementById("email").value = email;
+
+  
+}
+function Zap(){
+  
+  window.open('https://web.whatsapp.com/send?phone=+55'+document.getElementById("whatsapp").value, '_blank');
+}
+
+function Email(){
+  //<a href="mailto:email_que_recebe_as_mensagens@exemplo.com?Subject=Título%20da%20mensagem">Enviar email</a> 
+
+  window.open('mailto:'+document.getElementById("email").value+'?Subject=Vou ajudar', '_blank');
+}
+
+
+function updatePerfil(){
+
+   var name_ = document.getElementById('name').value
+    var email_ = document.getElementById('email2').value;
+    var whatsapp_ = document.getElementById('whatsapp2').value;
+    var user_id_ = String(logado_key);
+    var password_ = document.getElementById('password').value;
+
+     const body = {
+           name: name_,
+           email: email_,
+           whatsapp: whatsapp_,
+           password: password_
+   };
+ //      //    user_id: user_id_,
+
+    if(password_ === "") {
+        window.location.replace("http://localhost:8080/pages");
+
+
+
+   }else{
+            axios.put(`http://localhost:3333/users/${user_id_}/`, body, {
+               headers: {
+      'Authorization': `${String(logado_key)}`
+    }
+
+          })
+        .then(function (response) {
+           console.log(response)
+           document.location.reload(true);
+           // window.location.replace("http://localhost:8080/pages/listaCasos.html#1");
+       })
+         .catch(function (error) {
+           console.log(error)
+          
+          });
+    }
+ 
+  
+}
 
   </script>
 
@@ -14,17 +142,114 @@ var logado = sessionStorage.getItem('key')
 
     <link rel="stylesheet" href="src/style/casos.css">
     <link rel="stylesheet" href="src/style/midia.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
 </head>
-<body>
+<body onload="sessionLogin();">
     <h6 id="login">Bem-Vindo, <script type="text/javascript">document.write(logado);</script></h6>
     <header>
         
         <p>Escolha um dos casos abaixo e ajude :)</p>
-        <a href="casosConcluidos.html">
+        <a href="casosConcluidos.html#1">
             <button>Casos concluidos</button> 
         </a>
+                <a href="#"><button onclick="perfil();" data-toggle="modal" data-target="#modal_user">Perfil</button></a>
+        <a href="#"><button onclick="logout();">Sair</button></a>
+
+        
+        <a id="voltar" onclick="voltar();" style="font-size: 30px; margin-right: 100px;">Voltar</a>
+
+        <a id="proximo" onclick="mudar();" style="font-size: 30px;">Proximo</a>
+
+
 
          </header>
+
+
+ <div class="container">
+     <!-- The Modal -->
+        <div class="modal" id="modal_case">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="id_caso">Ajude!!!</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <label>Ajude - entre em contato com email ou whatsapp para ajudar </label>
+                        <br>
+                        <label>Email</label>
+                        <input id="email" placeholde="" value="" class="form-control" readonly>
+                        <br>
+                        <label>Whatsapp</label>
+                        <input id="whatsapp" placeholde="" value="" class="form-control" readonly>
+                        <br>
+                       
+
+
+
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                     <button type="button" class="btn btn-success" data-dismiss="modal" onclick="Email();" id="">Contatar Email</button>
+                     <button type="button" class="btn btn-success" data-dismiss="modal" onclick="Zap();" id="">Contatar Zap</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
+                <!-- The Modal -->
+        <div class="modal" id="modal_user">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="id_caso">Editar Dados</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <label>Nome:</label>
+                        <input id="name" value="" class="form-control">
+                        <br>
+                        <label>Email:</label>
+                        <input id="email2" value="" class="form-control">
+                        <br>
+                        <label>Whatsapp:</label>
+                        <input id="whatsapp2" value="" class="form-control">
+                        <br>
+                        <label>Password</label>
+                        <input id="password" value="" class="form-control">
+
+
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal" id="update_users" onclick="updatePerfil();">Salvar</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+ </div>
+
 
        <div id="box-casos">
            <ul id="teste">
@@ -39,7 +264,38 @@ var logado = sessionStorage.getItem('key')
 
 <script>
 
+function logout() {
+
+sessionStorage.removeItem('key'); 
+sessionStorage.removeItem('key_id'); 
+sessionStorage.clear();  
+
+window.location.replace("http://localhost:8080/pages/index.html");
+}
+
+
     class Api{
+
+
+
+      static async getPerfil (){
+       axios.get(`http://localhost:3333/users` ,
+       {
+          headers: {
+    'Authorization': `${String(logado_key)}`
+       }
+       })
+      .then(response => (document.getElementById('name').value = response.data[0].name
+                         ,document.getElementById('email2').value = response.data[0].email
+                         ,document.getElementById('whatsapp2').value = response.data[0].whatsapp
+                         ,document.getElementById('password').value = response.data[0].password
+        ))
+
+      
+      .catch(error => console.log(error)) 
+     }
+
+
      static async getCases (page){
        axios.get(`http://localhost:3333/cases?page=${page}`)
       .then(response => list_cases(response.data))
@@ -50,10 +306,13 @@ var logado = sessionStorage.getItem('key')
 if(logado === '' || logado === 'null')  {
 
 }else{
-  Api.getCases('1')
+  var t = window.location.href;
+  let novo = t.split('#');
+  Api.getCases(parseInt(novo[1]))
 }
 
  const list_cases = ( cases ) => {
+    btn_log = btn_log + 1
 
     const bycases = document.getElementById('teste')
     cases.map(cases => {
@@ -64,7 +323,13 @@ if(logado === '' || logado === 'null')  {
       div_aju.setAttribute("id", "ajudar");
 
       const btn_aju = document.createElement("BUTTON");
+      btn_aju.setAttribute("id", "btnAjudar");
+      btn_aju.setAttribute("onClick", "ajudar("+btn_log+");");
+      btn_aju.setAttribute("data-toggle", "modal");
+      btn_aju.setAttribute("data-target", "#modal_case");
       btn_aju.innerHTML = "Ajudar";  
+
+      btn_log = btn_log + 1;
 
       const div_dados = document.createElement('div')
       div_dados.className = 'dados';

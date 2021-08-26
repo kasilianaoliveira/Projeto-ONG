@@ -2,7 +2,49 @@
 <html lang="pt-br">
 <head>
   <script type="text/javascript">
-    var logado = sessionStorage.getItem('key')
+
+  var pagina = window.location.href;
+  let pagina_error = pagina.split('#');
+
+
+//tirar error VAZIO PAGINACAO
+  if(pagina_error[1] == "NaN"){
+     window.location.replace("http://localhost:8080/pages/casosConcluidos.html#1");
+   }
+
+    var logado = sessionStorage.getItem('key');
+    var logado_key = sessionStorage.getItem('key_id');
+
+
+function mudar(){
+  var t = window.location.href;
+  let novo = t.split('#');
+
+  var arroz = parseInt(novo[1]) + 1;
+  
+  var proximo = novo[0]+'#'+arroz;
+  window.location.href = proximo;
+   document.location.reload(true);
+ //alert(proximo);
+  
+}
+
+function voltar(){
+  var t = window.location.href;
+  let novo = t.split('#');
+
+  var arroz = parseInt(novo[1]) - 1;
+
+  if(arroz >= 1){
+    var proximo = novo[0]+'#'+arroz;
+    window.location.href = proximo;
+    document.location.reload(true);
+  }
+
+
+}
+
+
   </script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -23,6 +65,10 @@
         </a>
         <button onclick="logout();">Sair</button>  
     </header>
+
+        <a id="voltar" onclick="voltar();" style="font-size: 30px; margin-right: 200px;margin-left: 110px; float: center;">Voltar</a>
+
+        <a id="proximo" onclick="mudar();" style="font-size: 30px;position: relative;margin-right: 200px;">Proximo</a>
 
        <div id="box-casos">
            <ul id="teste">
@@ -59,7 +105,9 @@ window.location.replace("http://localhost:8080/pages/index.html");
 if(logado === '' || logado === 'null'){
 
 }else{
-  Api.getCases('1')
+  var t = window.location.href;
+  let novo = t.split('#');
+  Api.getCases(parseInt(novo[1]))
 }
 
  const list_cases_concluidos = ( cases ) => {

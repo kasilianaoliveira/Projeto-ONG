@@ -56,22 +56,34 @@
   var password_ = document.getElementById('pas').value;
   var myHeaders = new Headers();
 
-    axios.post('http://localhost:3333/sessions', {
+
+  const body = {
     login: login_,
     password: password_
-  })
+  };
+
+   axios.post('http://localhost:3333/sessions', body, {
+  headers: {
+    'Authorization': 'token'
+  }
+
+ 
+  }
+
+    
+  )
   .then(function (response) {
-   console.log(response)
+  //  
+   // console.log(response.headers.data)
    sessionStorage.setItem('key',login_);
-   window.location.replace("http://localhost:8080/pages/casos.html");
+   sessionStorage.setItem('key_id',JSON.stringify(response.data.id));
+   window.location.replace("http://localhost:8080/pages/casos.html#1");
 
   })
   .catch(function (error) {
     console.log(error)
     window.location.replace("http://localhost:8080/pages/loginDoador.html");
   });
-
-
 
     });
 

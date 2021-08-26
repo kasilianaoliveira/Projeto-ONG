@@ -59,6 +59,12 @@ function voltar(){
 }
     
 
+function sessionLogin(){
+	if(logado_key === null){
+		logout();
+	}
+}
+
 function deletar(button){
 //console.log('#dados > *');
   let buscar = document.querySelectorAll('#buscar');
@@ -183,7 +189,7 @@ function editar(button){
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
 
 </head>
-<body>
+<body onload="sessionLogin();">
     <header>
         <h6>Bem-Vindo, <script type="text/javascript">document.write(logado)</script></h6>
         

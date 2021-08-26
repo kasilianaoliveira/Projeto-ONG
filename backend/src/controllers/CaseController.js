@@ -4,13 +4,16 @@ module.exports = {
     async index(request, response) {
     try {
       const { page = 1 } = request.query;
+    //  const user_id = request.headers.authorization;
 
       const count = await connection('cases').count();
+      //recebe o valor total de rows
 
       const cases = await connection('cases')
         .join('users', 'users.id', '=', 'cases.user_id')
         .limit(5)
         .offset((page-1)*5)
+        .andWhere('status', 'Pendente')
         .select([
           'cases.*',
           'users.name',
@@ -19,7 +22,7 @@ module.exports = {
           'users.city',
           'users.uf',
         ]);
-
+      //count undefined
        response.header('X-Total-Count', count[0]['count']);
 
       return response.json(cases);
@@ -30,7 +33,8 @@ module.exports = {
    },
 
   async create(request, response) {
-    const { title, description, value, user_id, status } = request.body;
+    const { title, description, value, status } = request.body;
+    const user_id = request.headers.authorization;
 
     const result = await connection('users')
     .select('users')
@@ -49,7 +53,7 @@ module.exports = {
       status,
     })
 
-    return response.status(200).send('Caso cadastrado com sucesso');
+    return response.status(200).send('SUCESSO');
       
     }
 
@@ -66,9 +70,9 @@ module.exports = {
         .select('user_id')
         .first();
 
-      if (cases.user_id != user_id) {
-        return response.status(401).json({ error: 'Operation not permitted' });
-      }
+       if (cases.user_id != user_id) {
+         return response.status(401).json({ error: 'Operation not permitted' });
+       }
 
       await connection('cases').where({id}).update({title, description, value, status})
       return response.status(204).send();
@@ -83,14 +87,16 @@ module.exports = {
       const { id } = request.params;
       const user_id = request.headers.authorization;
 
+ //     console.log(user_id);
+
       const cases = await connection('cases')
       .where('id', id)
       .select('user_id')
       .first();
 
       if (cases.user_id != user_id) {
-        return response.status(401).json({ error: 'Operation not permitted' });
-      }
+          return response.status(401).json({ error: 'Operation not permitted' });
+        }
 
       await connection('cases').where({id}).delete();
       return response.status(204).send();
